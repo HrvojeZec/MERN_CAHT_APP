@@ -2,6 +2,7 @@ const User = require("../model/user");
 const bcryprt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Joi = require('joi');
+
 const register = async (req, res, next) => {
 
     try {
@@ -67,9 +68,9 @@ const login = async (req, res, next) => {
             expiresIn: "35s",
         })
 
-        /* if (req.cookies[`${existingUser._id}`]) {
+        if (req.cookies[`${existingUser._id}`]) {
             req.cookies[`${existingUser._id}`] = "";
-        } */
+        }
         res.cookie(String(existingUser._id), token, {
             path: '/',
             expires: new Date(Date.now() + 1000 * 35),

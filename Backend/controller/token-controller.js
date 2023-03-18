@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const verifyToken = (req, res, next) => {
     const cookies = req.headers.cookie;
+    console.log(req.headers);
     const token = cookies.split("=")[1];
     if (!token) {
         res.status(404).json({ message: "No token found" });
@@ -17,7 +18,7 @@ const verifyToken = (req, res, next) => {
 
 const refreshToken = (req, res, next) => {
     const cookies = req.headers.cookie;
-    console.log(cookies);
+
     const prevToken = cookies.split("=")[1];
     if (!prevToken) {
         res.status(404).json({ message: "No token found" });

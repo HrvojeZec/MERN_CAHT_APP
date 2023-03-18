@@ -1,29 +1,37 @@
 import React, { useEffect, useState } from "react";
 
-let firstRender = true;
 export function Home() {
   const [user, setUser] = useState();
-  const token = JSON.parse(localStorage.getItem("token"));
-  console.log("token: ", token);
-  const sednRequest = async () => {
-    await fetch("http://localhost:5000/api/user", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((error) => console.log(error));
+  const [effectHasRun, setEffectHasRun] = useState(false);
+  const sendRequest = async () => {
+    const response = await fetch("http://localhost:5000/api/user", {
+      credentials: "include",
+    }).catch((error) => console.log(error));
+    const data = await response.json();
+    console.log(data);
+    return data;
   };
 
+  const refreshToken = async () => {
+    const response = await fetch(
+      "http://localhost:5000/api/user/refreshToken",
+      {
+        credentials: "include",
+      }
+    ).catch((error) => console.log(error));
+    const data = await response.json();
+    return data;
+  };
   useEffect(() => {
-    if (firstRender) {
-      firstRender = false;
-      sednRequest().then((data) => setUser(data.findUser));
+    if (!effectHasRun) {
+      sendRequest().then((data) => setUser(data.findUser));
+      setEffectHasRun(true);
     }
+    /* 
+    let interval = setInterval(() => {
+      refreshToken().then((data) => setUser(data.findUser));
+    }, 1000 * 29);
+    return () => clearInterval(interval); */
   }, []);
 
   return <div>{user && <h1>{user.username}</h1>}</div>;

@@ -73,8 +73,7 @@ function LoginPage() {
       setErrorPassword(null);
       const data = await res.json();
       navigate("/home");
-      console.log("login token created: ", JSON.stringify(data.token));
-      localStorage.setItem("token", JSON.stringify(data.token));
+      console.log(data);
     } catch (error) {
       console.log(error);
     }
