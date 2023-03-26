@@ -73,7 +73,7 @@ const login = async (req, res, next) => {
         }
         res.cookie(String(existingUser._id), token, {
             path: '/',
-            expires: new Date(Date.now() + 1000 * 35),
+            expires: new Date(Date.now() + 1000 * 30),
             httpOnly: true,
             sameSite: 'lax',
         })
@@ -84,5 +84,24 @@ const login = async (req, res, next) => {
     }
 }
 
+const logout = async (req, res, next) => {
+    const cookies = req.headers.cookie;
 
-module.exports = { register, login }
+    const prevToken = cookies.split("=")[1];
+    if (!prevToken) {
+        res.status(404).json({ message: "No token found" });
+    }
+    jwt.verify(String(prevToken), process.env.JWT_SECRET_KEY, (err, user) => {
+        if (err) {
+            return res.status(403).json({ message: "Authentication failed" });
+        }
+        res.clearCookie(`${user.id}`);
+        req.cookies[`${user.id}`] = "";
+
+        return res.status(200).json({ message: "successfully logout" })
+    })
+
+
+}
+
+module.exports = { register, login, logout }

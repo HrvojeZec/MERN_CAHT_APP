@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 
 const verifyToken = (req, res, next) => {
     const cookies = req.headers.cookie;
-    console.log(req.headers);
     const token = cookies.split("=")[1];
     if (!token) {
         res.status(404).json({ message: "No token found" });
@@ -33,7 +32,7 @@ const refreshToken = (req, res, next) => {
         const newToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
             expiresIn: "35s",
         })
-        console.log("Regenerated Token:\n", newToken);
+        /*  console.log("Regenerated Token:\n", newToken); */
         res.cookie(String(user.id), newToken, {
             path: '/',
             expires: new Date(Date.now() + 1000 * 35),

@@ -12,6 +12,8 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { authActions } from "../../routing/configureAuth";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -45,6 +47,7 @@ function LoginPage() {
   const [errorUsername, setErrorUsername] = useState();
   const [errorPassword, setErrorPassword] = useState();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const form = useForm({
     initialValues: {
@@ -55,8 +58,9 @@ function LoginPage() {
 
   const handleSubmit = async ({ username, password }) => {
     try {
-      const res = await fetch("http://localhost:5000/api/login", {
+      const res = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: username,
@@ -67,11 +71,13 @@ function LoginPage() {
         const data = await res.json();
         setErrorUsername(data.messageUsername);
         setErrorPassword(data.messagePassword);
+        console.log(data.messageUsername || data.messagePassword);
         return;
       }
       setErrorUsername(null);
       setErrorPassword(null);
       const data = await res.json();
+      dispatch(authActions.login());
       navigate("/home");
       console.log(data);
     } catch (error) {

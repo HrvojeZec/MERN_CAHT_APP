@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-const UserContext = createContext();
+const UsersContext = createContext();
 
-export function useUserdata() {
-  const context = useContext(UserContext);
+export function useUsersdata() {
+  const context = useContext(UsersContext);
   if (context === undefined) {
     throw new Error("usePersonData msut be used with a PersonProveder");
   }
@@ -13,31 +13,26 @@ export function useUserdata() {
 export function UsersProvider({ children }) {
   const [data, setData] = useState();
   const [error, setError] = useState();
-  /* const tokenString = localStorage.setItem("token");
-  const token = JSON.stringify(tokenString); */
-  const token = JSON.parse(localStorage.getItem("token"));
-  console.log("token: ", token);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (token == null) {
-      console.log(!token);
-      return;
-    }
+    setLoading(true);
     fetch("http://localhost:5000/api/user/all", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => setData(data))
-      .catch((error) => setError(error));
+      .catch((error) => setError(error))
+      .finally(setLoading(false));
   }, []);
 
   const value = {
     data,
     error,
+    loading,
   };
-  console.log(value);
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+
+  return (
+    <UsersContext.Provider value={value}>{children}</UsersContext.Provider>
+  );
 }

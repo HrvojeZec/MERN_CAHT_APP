@@ -17,17 +17,17 @@ import { BrandSnapchat } from "tabler-icons-react";
 
 const useStyles = createStyles((theme) => ({
   footer: {
-    position: "absolute",
+    position: "fixed",
     bottom: 0,
     left: 0,
     width: "100%",
     borderTop: `${rem(1)} solid ${theme.colors.gray[2]}`,
     backgroundColor: theme.colors.dark[6],
     color: theme.colors.gray[0],
-    display: "flex", // set display to flex
-    justifyContent: "space-between", // align content to the right
+    display: "flex",
+    justifyContent: "space-between",
     alignItems: "center",
-    padding: `${theme.spacing.xl}px ${theme.spacing.lg}px`, // simplify padding
+    padding: `${theme.spacing.xl}px ${theme.spacing.lg}px`,
   },
   inner: {
     display: "flex",

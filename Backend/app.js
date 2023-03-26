@@ -5,8 +5,7 @@ const mongoose = require('mongoose');
 const cookieParser = require("cookie-parser");
 require('dotenv').config();
 
-const registerRouter = require("./router/registerRouter");
-const loginRouter = require("./router/loginRouter");
+const authRouter = require("./router/authRouter");
 const userRouter = require("./router/userRouter");
 const messageRouter = require("./router/messageRouter");
 
@@ -21,8 +20,9 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/register", registerRouter);
-app.use("/api/login", loginRouter);
+app.use("/api/auth/", authRouter);
+app.use("/api/auth/", authRouter);
+app.use("/api/auth/", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/message", messageRouter);
 

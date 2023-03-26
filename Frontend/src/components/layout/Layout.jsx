@@ -1,11 +1,12 @@
 import React from "react";
-import { Header } from "./Header";
+import { HeaderSearch } from "./Header";
 import { Footer } from "./Footer";
-
+import { Sidebar } from "./Sidebar";
 export function Layout(props) {
   return (
     <>
-      <Header />
+      <HeaderSearch />
+      <Sidebar />
       <main>{props.children}</main>
       <Footer />
     </>
