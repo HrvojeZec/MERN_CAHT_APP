@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   createStyles,
   Navbar,
@@ -8,9 +8,10 @@ import {
   Avatar,
   Space,
 } from "@mantine/core";
-
+import { Link } from "react-router-dom";
 import { useUserdata } from "../../stores/PersonContxt";
 import { useUsersdata } from "../../stores/GetAllUsers";
+import { Home } from "../../views/Home/Home";
 
 const useStyles = createStyles((theme) => ({
   navbar: {
@@ -151,29 +152,31 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export function Sidebar() {
+export function Sidebar(props) {
   const { classes } = useStyles();
-  const { user: user } = useUserdata();
+  const { user: currentUser } = useUserdata();
   const { data: users } = useUsersdata();
 
-  console.log(users.usersnames);
-  console.log("duljina ", users.length);
-  const submitHandler = (username) => {
-    console.log(username);
+  console.log(users.users);
+
+  const submitHandler = (userID) => {
+    console.log(userID);
+
+    props.onUserClicked(userID);
   };
-  const collectionLinks = users.usersnames.map((username) => (
+  const collectionLinks = users.users.map((user) => (
     <a
       href="/"
       onClick={(event) => {
         event.preventDefault();
-        submitHandler(username);
+        submitHandler(user.id);
       }}
-      key={username}
+      key={user.id}
       className={classes.collectionLink}
       style={{ display: "flex", alignItems: "center", marginBottom: rem(10) }}
     >
       <Avatar radius="xl" style={{ marginRight: rem(9), flexShrink: 0 }} />
-      <span style={{ fontSize: rem(16) }}>{username}</span>
+      <span style={{ fontSize: rem(16) }}>{user.username}</span>
     </a>
   ));
 
@@ -186,12 +189,11 @@ export function Sidebar() {
         <div style={{ marginBottom: "16px" }} className={classes.profile}>
           <Avatar radius="xl" />
           <div className={classes.profileInfo}>
-            <h1 className={classes.profileName}>{user.username}</h1>
-            <p className={classes.profileEmail}>{user.email}</p>
+            <h1 className={classes.profileName}>{currentUser.username}</h1>
+            <p className={classes.profileEmail}>{currentUser.email}</p>
           </div>
         </div>
       </Navbar.Section>
-
       <Navbar.Section className={classes.section}>
         <Group className={classes.collectionsHeader} position="apart">
           <Text size="sm" weight={500} color="dimmed">

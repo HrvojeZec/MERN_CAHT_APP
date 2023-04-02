@@ -2,6 +2,7 @@ const Messages = require("../model/messageModel");
 
 
 const addMessage = async (req, res, next) => {
+    console.log("body: ", req.body);
     try {
         const { from, to, message } = req.body;
         const data = await Messages.create({
@@ -22,6 +23,7 @@ const addMessage = async (req, res, next) => {
 }
 
 const getAllMessage = async (req, res, next) => {
+    console.log("getmsb: ", req.body);
     try {
         const { from, to } = req.body;
         const messages = await Messages.find({
@@ -29,19 +31,23 @@ const getAllMessage = async (req, res, next) => {
                 $all: [from, to]
             }
         }).sort({
-            updateAt: 1
+            updatedAt: 1
         })
+        console.log("messages: ", messages);
         const projectMessage = messages.map((msg) => {
+
             return {
 
                 fromSelf: msg.sender.toString() === from,
-                message: msg.message.text
+                message: msg.message.text,
+                id: msg._id
             }
 
         })
         res.json(projectMessage);
     } catch (error) {
         console.log(error);
+        res.status(500).json({ message: "Server error" });
     }
 }
 

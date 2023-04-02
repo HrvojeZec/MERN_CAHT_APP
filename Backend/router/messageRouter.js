@@ -11,17 +11,6 @@ router.post("/addmsg", addMessage, (req, res, next) => {
     }
 });
 
-router.get("/getmsg", async (req, res, next) => {
-    try {
-        try {
-            const response = await getAllMessage();
-            return res.json(response);
-        } catch (err) {
-            next(err);
-        }
-    } catch (error) {
-        next(error)
-    }
-});
+router.post("/getmsg", getAllMessage);
 
 module.exports = router

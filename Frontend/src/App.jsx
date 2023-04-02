@@ -7,7 +7,7 @@ import HomePage from "./views/Home/HomePage";
 
 function App() {
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
-  console.log("logedin: ", isLoggedIn);
+  console.log("loggedin: ", isLoggedIn);
   return (
     <Routes>
       {!isLoggedIn && (

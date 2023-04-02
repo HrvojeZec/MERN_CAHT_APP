@@ -18,8 +18,14 @@ const getAllUsers = async (req, res, next) => {
 
     try {
         const findUsers = await User.find();
-        const usersnames = findUsers.map(user => user.username);
-        res.status(200).json({ usersnames });
+        const users = findUsers.map(user => {
+            return {
+                username: user.username,
+                id: user._id
+            }
+        });
+
+        res.status(200).json({ users });
     } catch (error) {
         console.log(error);
     }
