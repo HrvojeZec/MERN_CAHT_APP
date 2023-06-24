@@ -43,7 +43,11 @@ const register = async (req, res, next) => {
             email,
             password: hashedPassword,
         })
-        return res.json({ user })
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
+            expiresIn: "1h",
+        });
+
+        return res.json({ user, token });
     } catch (error) {
         console.log(error);
     }
@@ -78,7 +82,7 @@ const login = async (req, res, next) => {
             sameSite: 'lax',
         })
 
-        return res.status(200).json({ existingUser, message: "Successfully Logged In", token });
+        return res.status(200).json({ existingUser, message: "Successfully Logged In" });
     } catch (error) {
         console.log(error);
     }

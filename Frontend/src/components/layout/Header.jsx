@@ -61,7 +61,7 @@ export function HeaderSearch() {
     <Group className={classes.header}>
       <div className={classes.searchWrapper}>
         <Flex gap="sm" align="center">
-          <Input
+          {/*   <Input
             placeholder="Search"
             value={searchQuery}
             onChange={handleSearchInputChange}
@@ -75,7 +75,7 @@ export function HeaderSearch() {
             color="blue"
           >
             Search
-          </Button>
+          </Button> */}
         </Flex>
       </div>
       <div>

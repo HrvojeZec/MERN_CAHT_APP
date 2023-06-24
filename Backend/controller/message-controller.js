@@ -23,7 +23,7 @@ const addMessage = async (req, res, next) => {
 }
 
 const getAllMessage = async (req, res, next) => {
-    console.log("getmsb: ", req.body);
+
     try {
         const { from, to } = req.body;
         const messages = await Messages.find({
@@ -33,7 +33,7 @@ const getAllMessage = async (req, res, next) => {
         }).sort({
             updatedAt: 1
         })
-        console.log("messages: ", messages);
+
         const projectMessage = messages.map((msg) => {
 
             return {

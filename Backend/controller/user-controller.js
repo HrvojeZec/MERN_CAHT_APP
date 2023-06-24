@@ -10,7 +10,7 @@ const getUser = async (req, res, next) => {
         return res.status(200).json({ findUser });
 
     } catch (error) {
-        return new Error(err)
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
@@ -27,7 +27,7 @@ const getAllUsers = async (req, res, next) => {
 
         res.status(200).json({ users });
     } catch (error) {
-        console.log(error);
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 }
 

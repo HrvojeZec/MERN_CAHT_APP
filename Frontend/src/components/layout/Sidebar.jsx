@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   createStyles,
   Navbar,
@@ -8,10 +8,8 @@ import {
   Avatar,
   Space,
 } from "@mantine/core";
-import { Link } from "react-router-dom";
 import { useUserdata } from "../../stores/PersonContxt";
 import { useUsersdata } from "../../stores/GetAllUsers";
-import { Home } from "../../views/Home/Home";
 
 const useStyles = createStyles((theme) => ({
   navbar: {
@@ -164,24 +162,35 @@ export function Sidebar(props) {
 
     props.onUserClicked(userID);
   };
-  const collectionLinks = users.users.map((user) => (
-    <a
-      href="/"
-      onClick={(event) => {
-        event.preventDefault();
-        submitHandler(user.id);
-      }}
-      key={user.id}
-      className={classes.collectionLink}
-      style={{ display: "flex", alignItems: "center", marginBottom: rem(10) }}
-    >
-      <Avatar radius="xl" style={{ marginRight: rem(9), flexShrink: 0 }} />
-      <span style={{ fontSize: rem(16) }}>{user.username}</span>
-    </a>
-  ));
+
+  const collectionLinks = users.users.map((user) => {
+    if (user.id !== currentUser._id) {
+      return (
+        <a
+          href="/"
+          onClick={(event) => {
+            event.preventDefault();
+            submitHandler(user.id);
+          }}
+          key={user.id}
+          className={classes.collectionLink}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            marginBottom: rem(10),
+          }}
+        >
+          <Avatar radius="xl" style={{ marginRight: rem(9), flexShrink: 0 }} />
+          <span style={{ fontSize: rem(16) }}>{user.username}</span>
+        </a>
+      );
+    } else {
+      return null;
+    }
+  });
 
   return (
-    <Navbar height={700} width={{ sm: 300 }} p="md" className={classes.navbar}>
+    <Navbar height={400} width={{ sm: 300 }} p="md" className={classes.navbar}>
       <Navbar.Section
         style={{ marginBottom: "16px" }}
         className={classes.section}

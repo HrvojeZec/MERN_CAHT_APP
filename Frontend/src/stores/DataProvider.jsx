@@ -1,18 +1,18 @@
 import React from "react";
 import { ServerError } from "../components/shared/Error/ServerError";
 import { FullscreenLoader } from "../components/shared/Loader/Fullscreenloader";
-import { UsersProvider } from "./GetAllUsers";
+import { UsersProvider, useUsersdata } from "./GetAllUsers";
 import { UserProvider, useUserdata } from "./PersonContxt";
 
 function DataProvidersInner({ children }) {
   const { loading: userLoading, error: userError } = useUserdata();
-
+  const { loading: usersLoading, error: usersError } = useUsersdata();
   console.log(userLoading);
-  if (userLoading) {
+  if (userLoading || usersLoading) {
     return <FullscreenLoader />;
   }
 
-  if (userError) {
+  if (userError || usersError) {
     return <ServerError error={userError} />;
   }
 

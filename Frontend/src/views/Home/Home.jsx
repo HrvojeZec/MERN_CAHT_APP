@@ -1,36 +1,81 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Avatar, Button, TextInput } from "@mantine/core";
 import { useUserdata } from "../../stores/PersonContxt";
+import { io } from "socket.io-client";
+
 export function Home(props) {
   const { user: currentUser } = useUserdata();
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState();
+  const [messages, setMessages] = useState([]);
+  const [arrivalMessage, setArrivalMessage] = useState(null);
+  const socket = useRef();
+  const scrollRef = useRef();
 
   const userID = props.userID;
-  console.log("home: ", userID, currentUser._id);
+
+  useEffect(() => {
+    if (currentUser) {
+      socket.current = io("http://localhost:5000");
+      socket.current.emit("add-user", currentUser._id);
+    }
+  }, [currentUser]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("Sending message:", message);
-    const response = await fetch("http://localhost:5000/api/message/addmsg", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: message,
-        from: currentUser._id,
-        to: userID,
-      }),
-    });
-    if (!response.ok) {
+
+    try {
+      const response = await fetch("http://localhost:5000/api/message/addmsg", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: message,
+          from: currentUser._id,
+          to: userID,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        console.log(data);
+        return;
+      }
+
       const data = await response.json();
       console.log(data);
-      return;
+
+      setMessage("");
+      socket.current.emit("send-msg", {
+        to: userID,
+        from: currentUser._id,
+        message,
+      });
+
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { fromSelf: true, message: message },
+      ]);
+    } catch (error) {
+      console.log(error);
     }
-    const data = await response.json();
-    console.log(data);
-    setMessage("");
   };
+
+  useEffect(() => {
+    if (socket.current) {
+      socket.current.on("msg-recieve", (msg) => {
+        setArrivalMessage({ fromSelf: false, message: msg });
+      });
+    }
+  });
+
+  useEffect(() => {
+    arrivalMessage &&
+      setMessages((prevMessages) => [...prevMessages, arrivalMessage]);
+  }, [arrivalMessage]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -47,11 +92,13 @@ export function Home(props) {
             }),
           }
         );
+
         if (!response.ok) {
           const data = await response.json();
           console.log(data);
           return;
         }
+
         const data = await response.json();
         console.log(data);
         setMessages(data);
@@ -59,44 +106,49 @@ export function Home(props) {
         console.log(error);
       }
     };
+
     if (userID) {
       fetchMessages();
     }
   }, [userID, currentUser._id]);
 
-  console.log("messages: ", messages);
   const renderMessages = () => {
     if (!messages) {
       return null;
     }
+
     return messages.map((msg, index) => {
       const isFromSelf = msg.fromSelf;
-      const style = {
+
+      const containerStyle = {
         display: "flex",
-        alignSelf: isFromSelf ? "flex-end" : "flex-start",
+        alignItems: "center",
+        justifyContent: isFromSelf ? "flex-end" : "flex-start",
         marginBottom: 8,
-        maxWidth: "60%",
-        backgroundColor: isFromSelf ? "#d5f5dc" : "#f5d5d5",
-        padding: 8,
-        borderRadius: 4,
-        justifyContent: isFromSelf ? "flex-start" : "flex-end", // add this line
       };
 
       const messageStyle = {
         display: "flex",
         alignItems: "center",
-        justifyContent: "center",
-        padding: 10,
+        padding: "8px 12px",
+        borderRadius: 8,
+        backgroundColor: isFromSelf ? "#d5f5dc" : "#f5d5d5",
+        color: isFromSelf ? "#333" : "#555",
+        maxWidth: "60%",
       };
+
       const avatarStyle = {
-        marginLeft: isFromSelf ? 8 : 0,
+        width: 32,
+        height: 32,
         marginRight: isFromSelf ? 0 : 8,
+        marginLeft: isFromSelf ? 8 : 0,
       };
+
       return (
-        <div key={msg.id} style={style}>
-          {isFromSelf ? <Avatar radius="xl" style={avatarStyle} /> : null}
-          <span style={messageStyle}>{msg.message}</span>
-          {isFromSelf ? null : <Avatar radius="xl" style={avatarStyle} />}
+        <div key={index} style={containerStyle}>
+          {!isFromSelf && <Avatar radius="xl" style={avatarStyle} />}
+          <div style={messageStyle}>{msg.message}</div>
+          {isFromSelf && <Avatar radius="xl" style={avatarStyle} />}
         </div>
       );
     });
@@ -105,11 +157,22 @@ export function Home(props) {
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       {userID && (
-        <div style={{ flex: 1, overflowY: "scroll" }}>{renderMessages()}</div>
+        <div style={{ flex: 1, overflowY: "scroll", paddingBottom: "56px" }}>
+          {renderMessages()}
+          <div ref={scrollRef}></div>
+        </div>
       )}
+      {!userID && <div style={{ flex: 1, overflowY: "scroll" }}></div>}
       <form
         onSubmit={handleSubmit}
-        style={{ display: "flex", alignItems: "center" }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          position: "sticky",
+          bottom: 0,
+          background: "white",
+          padding: "8px",
+        }}
       >
         <TextInput
           placeholder="Type a message..."

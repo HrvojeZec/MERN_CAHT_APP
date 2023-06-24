@@ -17,7 +17,11 @@ const verifyToken = (req, res, next) => {
 
 const refreshToken = (req, res, next) => {
     const cookies = req.headers.cookie;
-
+    console.log(cookies);
+    if (!cookies) {
+        res.status(404).json({ message: "No token found" });
+        return;
+    }
     const prevToken = cookies.split("=")[1];
     if (!prevToken) {
         res.status(404).json({ message: "No token found" });
